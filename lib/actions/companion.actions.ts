@@ -104,21 +104,26 @@ export const getUserCompanions = async (userId: string) => {
 
     if(error) throw new Error(error.message);
 
-    return data;
+    return data?.filter(
+    (companion, index, self) =>
+    index === self.findIndex((c) => c.id === companion.id)
+    );
 }
 
 export const newCompanionPermissions = async () => {
     const { userId, has } = await auth();
+    if (!userId) return false;
+    
     const supabase = createSupabaseClient();
 
-    let limit = 0;
+    let limit = 3; // Berikan default limit 3 untuk free plan jika belum tersetting
 
     if(has({ plan: 'pro' })) {
         return true;
-    } else if(has({ feature: "3_companion_limit" })) {
-        limit = 3;
     } else if(has({ feature: "10_companion_limit" })) {
         limit = 10;
+    } else if(has({ feature: "3_companion_limit" })) {
+        limit = 3;
     }
 
     const { data, error } = await supabase
@@ -128,10 +133,10 @@ export const newCompanionPermissions = async () => {
 
     if(error) throw new Error(error.message);
 
-    const companionCount = data?.length;
+    const companionCount = data?.length || 0;
 
     if(companionCount >= limit) {
-        return false
+        return false;
     } else {
         return true;
     }
@@ -142,10 +147,15 @@ export const addBookmark = async (companionId: string, path: string) => {
   const { userId } = await auth();
   if (!userId) return;
   const supabase = createSupabaseClient();
-  const { data, error } = await supabase.from("bookmarks").insert({
+  const { data, error } = await supabase.from("bookmarks").upsert({
     companion_id: companionId,
     user_id: userId,
-  });
+  },
+  {
+  onConflict:"user_id,companion_id",
+  ignoreDuplicates: true,
+  }
+  );
   if (error) {
     throw new Error(error.message);
   }
@@ -183,4 +193,26 @@ export const getBookmarkedCompanions = async (userId: string) => {
   }
   // We don't need the bookmarks data, so we return only the companions
   return data.map(({ companions }) => companions);
+};
+
+export const deleteCompanion = async (companionId: string, path: string) => {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const supabase = createSupabaseClient();
+
+    // Hapus data companion berdasarkan ID dan pastikan pembuatnya adalah user yang sedang login
+    const { error } = await supabase
+        .from('companions')
+        .delete()
+        .eq('id', companionId)
+        .eq('author', userId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    // Merefresh halaman agar kartu companion yang dihapus langsung hilang dari UI
+    revalidatePath(path);
+    return { success: true };
 };

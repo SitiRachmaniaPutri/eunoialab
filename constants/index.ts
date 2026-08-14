@@ -1,19 +1,19 @@
 export const subjects = [
-  "maths",
   "language",
   "science",
   "history",
-  "coding",
   "economics",
+  "art",      
+  "music",    
 ];
 
 export const subjectsColors = {
   science: "#E5D0FF",
-  maths: "#FFDA6E",
   language: "#BDE7FF",
-  coding: "#FFC8E4",
   history: "#FFECC8",
   economics: "#C8FFDF",
+  art: "#FFD1D1",      
+  music: "#D1F5FF",    
 };
 
 export const voices = {
@@ -30,14 +30,14 @@ export const recentSessions = [
     duration: 45,
     color: "#E5D0FF",
   },
-  {
-    id: "2",
-    subject: "maths",
-    name: "Countsy the Number Wizard",
-    topic: "Derivatives & Integrals",
-    duration: 30,
-    color: "#FFDA6E",
-  },
+  // {
+  //   id: "2",
+  //   subject: "maths",
+  //   name: "Countsy the Number Wizard",
+  //   topic: "Derivatives & Integrals",
+  //   duration: 30,
+  //   color: "#FFDA6E",
+  // },
   {
     id: "3",
     subject: "language",
