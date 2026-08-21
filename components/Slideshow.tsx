@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const slideImages = [
-  "/images/screenshot 1.png",
-  "/images/screenshot 2.png",
-  "/images/screenshot 3.png",
+  "/images/screenshot1.png",
+  "/images/screenshot2.png",
+  "/images/screenshot3.png",
 ];
 
 const Slideshow = () => {
